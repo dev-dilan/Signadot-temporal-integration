@@ -47,7 +47,7 @@ Navigate to the `node_client/client_server.js` file to see this in context. When
             taskQueue: TASK_QUEUE,
             workflowId: workflowId,
             headers: {
-                // Example: setting a 'test-header'
+                // Example: setting a 'sd-routing-key'
                 'sd-routing-key': defaultPayloadConverter.toPayload('abc-123'),
             },
         };
