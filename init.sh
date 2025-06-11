@@ -7,6 +7,8 @@ else
   echo "docker-compose directory already exists, skipping clone."
 fi
 docker compose -f docker-compose/docker-compose.yml up -d
-./temporal_worker/build.sh
+cd ./temporal_worker
+./build.sh
+cd ../
 docker build -f ./node_client/Dockerfile -t temporal-nodejs-client-ui ./node_client
 docker compose up -d

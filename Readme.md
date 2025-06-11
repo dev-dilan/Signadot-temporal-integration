@@ -51,3 +51,12 @@ Navigate to the `node_client/client_server.js` file to see this in context. When
                 'sd-routing-key': defaultPayloadConverter.toPayload('abc-123'),
             },
         };
+```
+
+## Cleaning Up Resources
+
+To stop all running services, remove the containers, networks, and volumes created by `docker-compose up`, execute the cleanup script:
+
+```bash
+./down.sh
+```
