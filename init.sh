@@ -11,4 +11,5 @@ cd ./temporal_worker
 ./build.sh
 cd ../
 docker build -f ./node_client/Dockerfile -t temporal-nodejs-client-ui ./node_client
-docker compose up -d
+docker build -f ./py_client/Dockerfile -t temporal-py-client-ui ./py_client
+docker compose up
