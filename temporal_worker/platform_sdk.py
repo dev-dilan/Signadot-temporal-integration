@@ -159,8 +159,7 @@ class _SelectiveWorkflowInboundInterceptor(WorkflowInboundInterceptor):
 
     async def execute_workflow(self, input: ExecuteWorkflowInput) -> Any:
         print(f"WORKFLOW INTERCEPTOR (INBOUND) STARTED for workflow type: {input.workflow_type}") # Your debug print
-        # routing_key = self.outer_interceptor._extract_routing_key(input.memo.get('fields'))
-        routing_key = ""
+        routing_key = self.outer_interceptor._extract_routing_key(input.header.get('sd-routing-key'))
         if not await self.outer_interceptor._should_process_task_with_client("workflow", input.workflow_type, routing_key):
             print(f"WORKFLOW INTERCEPTOR (INBOUND): Skipping workflow {input.workflow_type} (key: {routing_key}) based on routing rules.")
             raise ApplicationError(
@@ -177,8 +176,7 @@ class _SelectiveActivityInboundInterceptor(ActivityInboundInterceptor):
 
     async def execute_activity(self, input: ExecuteActivityInput) -> Any:
         print(input)
-        # routing_key = self.outer_interceptor._extract_routing_key(input.memo.get('fields'))
-        routing_key = ""
+        routing_key = self.outer_interceptor._extract_routing_key(input.header.get('sd-routing-key'))
         activity_name = str(input.fn.__name__)
         print(f"ACTIVITY INTERCEPTOR (INBOUND) STARTED for activity: {activity_name}") # Debug print
 
