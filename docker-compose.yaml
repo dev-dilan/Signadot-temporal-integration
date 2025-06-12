@@ -8,7 +8,7 @@ services:
       - TASK_QUEUE=money-transfer
       - SANDBOX_NAME=
       - TEMPORAL_SERVER_URL=temporal:7233
-      - ROUTES_API_ROUTE_SERVER_ADDR=http://localhost
+      - ROUTES_API_ROUTE_SERVER_ADDR=http://35.198.218.36
       - ROUTES_API_BASELINE_NAMESPACE=hotrod
       - ROUTES_API_BASELINE_NAME=location
     networks:
