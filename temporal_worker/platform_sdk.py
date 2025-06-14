@@ -348,7 +348,43 @@ class SandboxAwareWorker:
         self.activities = activities
         self.sandbox_name = os.getenv("SANDBOX_NAME", "")
 
-    
+    async def run(self):
+        """Run the sandbox-aware worker"""
+        print(f"Starting SandboxAwareWorker...")
+        print(f"Task Queue: {self.task_queue}")
+        print(f"Sandbox Name: {self.sandbox_name or 'baseline'}")
+        workflow_names = []
+        for w in self.workflows:
+            if hasattr(w, '__name__'):
+                 workflow_names.append(w.__name__)
+            elif hasattr(w, '__class__') and hasattr(w.__class__, '__name__'):
+                 workflow_names.append(w.__class__.__name__)
+            else:
+                 workflow_names.append(str(w))
+        print(f"Workflows: {workflow_names}")
+        print(f"Activities: {len(self.activities)} activities registered")
+        
+        try:
+            temporal_url = os.getenv("TEMPORAL_SERVER_URL", "temporal-server:7233")
+            client = await Client.connect(temporal_url)
+            print(f"Connected to Temporal server: {temporal_url}")
+            
+            interceptor = SelectiveTaskInterceptor() 
+            
+            worker = Worker(
+                client,
+                task_queue=self.task_queue,
+                workflows=self.workflows,
+                activities=self.activities,
+                interceptors=[interceptor] 
+            )
+            
+            print(f"Worker created successfully. Starting to poll for tasks...")
+            await worker.run()
+            
+        except Exception as e:
+            print(f"Error running worker: {e}")
+            raise
 
     # debug inteceptor registration in detail with debuging points 
     # async def run(self):
