@@ -8,7 +8,7 @@ services:
       - TASK_QUEUE=money-transfer
       - SANDBOX_NAME=
       - TEMPORAL_SERVER_URL=temporal:7233
-      - ROUTES_API_ROUTE_SERVER_ADDR=http://35.198.218.36
+      - ROUTES_API_ROUTE_SERVER_ADDR=http://127.0.0.1
       - ROUTES_API_BASELINE_NAMESPACE=hotrod
       - ROUTES_API_BASELINE_NAME=location
     networks:
@@ -17,26 +17,26 @@ services:
     volumes:
       - ./logs:/app/logs  # Mount logs directory
 
-  temporal-nodejs-client-ui:
-    image: temporal-nodejs-client-ui:latest
-    container_name: temporal-nodejs-client-ui
-    ports:
-      - "8000:3000" # Expose Node.js app on host port 8000, container port 3000
-    environment:
-      - TEMPORAL_SERVER_URL=temporal:7233 # Assumes 'temporal' is the service name of your Temporal server in Docker Compose
-      - TASK_QUEUE=money-transfer # Should match the task queue your Temporal worker is listening on
-      - PORT=3000 # Port inside the container
-      # - NODE_ENV=production # Already set in Dockerfile, but can be explicit here too
-    networks:
-      - temporal-network # Ensure this service is on the same network as your Temporal server
-    depends_on:
-      - worker-baseline # Optional: if you want Docker Compose to attempt to start Temporal first
+  # temporal-nodejs-client-ui:
+  #   image: temporal-nodejs-client-ui:latest
+  #   container_name: temporal-nodejs-client-ui
+  #   ports:
+  #     - "8000:3000" # Expose Node.js app on host port 8000, container port 3000
+  #   environment:
+  #     - TEMPORAL_SERVER_URL=temporal:7233 # Assumes 'temporal' is the service name of your Temporal server in Docker Compose
+  #     - TASK_QUEUE=money-transfer # Should match the task queue your Temporal worker is listening on
+  #     - PORT=3000 # Port inside the container
+  #     # - NODE_ENV=production # Already set in Dockerfile, but can be explicit here too
+  #   networks:
+  #     - temporal-network # Ensure this service is on the same network as your Temporal server
+  #   depends_on:
+  #     - worker-baseline # Optional: if you want Docker Compose to attempt to start Temporal first
 
   temporal-py-client-ui:
     image: temporal-py-client-ui:latest
     container_name: temporal-py-client-ui
     ports:
-      - "8001:8080" # Expose python app on host port 8001, container port 8080
+      - "8000:8080" # Expose python app on host port 8001, container port 8080
     environment:
       - TEMPORAL_SERVER_URL=temporal:7233 # Assumes 'temporal' is the service name of your Temporal server in Docker Compose
       - TASK_QUEUE=money-transfer # Should match the task queue your Temporal worker is listening on
