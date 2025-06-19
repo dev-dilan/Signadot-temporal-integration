@@ -46,7 +46,7 @@ class RoutesAPIClient:
         self._cache_update_lock = asyncio.Lock() # Lock for initiating an update
         self._cache_updated_event = asyncio.Event() # Event to signal update completion
         self._last_successful_update_time: float = 0.0 # Using time.monotonic()
-        self._is_first_update_done = False # Tracks if the first fetch attempt has completed
+        self._is_first_update_done = False # Tracks if the first fetch attempt has completed        
 
     def _build_routes_url(self) -> str:
         
@@ -123,6 +123,18 @@ class RoutesAPIClient:
                         # Cache was updated by another task while this one was waiting for the lock
                         if not self._cache_updated_event.is_set(): self._cache_updated_event.set()
 
+    async def _periodic_cache_updater(self):
+        print("RoutesAPIClient: Starting periodic cache updater...")
+        try:
+            while True:
+                print(f"RoutesAPIClient: Periodic cache updater triggering refresh for sandbox '{self.sandbox_name or 'baseline'}'.")
+                await self._ensure_cache_fresh()
+                await asyncio.sleep(self.refresh_interval)
+        except asyncio.CancelledError:
+            print(f"RoutesAPIClient: Periodic cache updater for sandbox '{self.sandbox_name or 'baseline'}' cancelled.")
+        except Exception as e:
+            print(f"RoutesAPIClient: Periodic cache updater for sandbox '{self.sandbox_name or 'baseline'}' error: {e}")
+            # Depending on the error, you might want to add retry logic or stop
 
     async def should_process(self, routing_key: Optional[str]) -> bool:
         
@@ -203,20 +215,7 @@ class SandboxAwareWorker:
         self.activities = activities
         self.sandbox_name = os.getenv("SANDBOX_NAME", "")
         self.routes_client = RoutesAPIClient(sandbox_name=self.sandbox_name)
-        self._cache_updater_task: Optional[asyncio.Task] = None
-
-    async def _periodic_cache_updater(self):
-        print("SandboxAwareWorker: Starting periodic cache updater...")
-        try:
-            while True:
-                print(f"SandboxAwareWorker: Periodic cache updater triggering refresh for sandbox '{self.sandbox_name or 'baseline'}'.")
-                await self.routes_client._ensure_cache_fresh()
-                await asyncio.sleep(self.routes_client.refresh_interval)
-        except asyncio.CancelledError:
-            print(f"SandboxAwareWorker: Periodic cache updater for sandbox '{self.sandbox_name or 'baseline'}' cancelled.")
-        except Exception as e:
-            print(f"SandboxAwareWorker: Periodic cache updater for sandbox '{self.sandbox_name or 'baseline'}' error: {e}")
-            # Depending on the error, you might want to add retry logic or stop
+        self._cache_updater_task: Optional[asyncio.Task] = None    
 
     async def run(self):
         print(f"Sandbox Name: {self.sandbox_name or 'baseline'}")
@@ -229,9 +228,8 @@ class SandboxAwareWorker:
             else:
                  workflow_names.append(str(w))
 
-        self._cache_updater_task = asyncio.create_task(self._periodic_cache_updater())
-        
         try:
+            self._cache_updater_task = asyncio.create_task(self.routes_client._periodic_cache_updater())
             temporal_url = os.getenv("TEMPORAL_SERVER_URL", "temporal-server:7233")
             client = await Client.connect(temporal_url)
             print(f"Connected to Temporal server: {temporal_url}")
