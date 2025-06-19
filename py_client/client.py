@@ -61,16 +61,3 @@ async def start_workflow_with_routing(payment_details: PaymentDetails, routing_k
         "run_id": handle.result_run_id,
         "routing_key_used": routing_key or "baseline"
     }
-
-if __name__ == "__main__":
-    # Example usage (optional, as the UI will trigger this)
-    example_payment = PaymentDetails(
-        from_account="acc_main_001",
-        to_account="acc_main_002",
-        amount="25.50",
-        reference="Test from client.py main"
-    )
-    # Test with a routing key
-    # asyncio.run(start_workflow_with_routing(payment_details=example_payment, routing_key="test-sandbox-key"))
-    # Test for baseline
-    asyncio.run(start_workflow_with_routing(payment_details=example_payment))
