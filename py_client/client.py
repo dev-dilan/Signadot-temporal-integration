@@ -36,7 +36,7 @@ async def start_workflow_with_routing(payment_details: PaymentDetails, routing_k
     """
     temporal_server_url = os.getenv("TEMPORAL_SERVER_URL", "temporal-server:7233")
     task_queue = os.getenv("TASK_QUEUE", "money-transfer")
-
+    
     # Prepare headers
     headers = {} # Corrected variable name from headers_dict to headers
     if routing_key:

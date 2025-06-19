@@ -6,7 +6,7 @@ services:
     container_name: temporal-worker-baseline
     environment:
       - TASK_QUEUE=money-transfer
-      # - SANDBOX_NAME=location-breaking-format
+      - SANDBOX_NAME=location-breaking-format
       - TEMPORAL_SERVER_URL=temporal:7233
       - ROUTES_API_ROUTE_SERVER_ADDR=http://35.198.218.36
       - ROUTES_API_BASELINE_NAMESPACE=hotrod
