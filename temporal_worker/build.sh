@@ -5,7 +5,7 @@ set -e
 
 # Configuration
 IMAGE_NAME="temporal-money-transfer"
-VERSION="baseline-v1.0"
+VERSION="baseline-v2.0"
 REGISTRY="asia-docker.pkg.dev/itone-295207/casino-backend"  # Replace with your actual registry
 FULL_IMAGE_NAME="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 

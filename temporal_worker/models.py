@@ -49,3 +49,16 @@ class DepositResponse:
     balance_after: str
     success: bool
     message: str = ""
+
+@dataclass
+class FraudDetectionRequest:
+    """Fraud detection activity input"""
+    payment_details: PaymentDetails
+    # Potentially add more context like user_ip, device_id etc. for real fraud detection
+
+@dataclass
+class FraudDetectionResponse:
+    """Fraud detection activity output"""
+    is_fraudulent: bool
+    reason: str = ""
+    risk_score: float = 0.0 # Optional: a score indicating risk level
