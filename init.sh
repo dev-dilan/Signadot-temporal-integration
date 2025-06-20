@@ -9,7 +9,6 @@ fi
 docker compose -f docker-compose/docker-compose.yml up -d
 cd ./temporal_worker
 ./build.sh
-cd ../
-docker build -f ./node_client/Dockerfile -t temporal-nodejs-client-ui ./node_client
-docker build -f ./py_client/Dockerfile -t temporal-py-client-ui ./py_client
+cd ../py_client
+./build.sh
 docker compose up

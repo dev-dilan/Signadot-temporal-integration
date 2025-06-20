@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-py-client-ui
+  labels:
+    app: temporal-py-client-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: temporal-py-client-ui
+  template:
+    metadata:
+      labels:
+        app: temporal-py-client-ui
+    spec:
+      containers:
+        - name: temporal-py-client-ui
+          # It's recommended to use specific image tags instead of 'latest' in production.
+          image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-py-client-ui:v1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TEMPORAL_SERVER_URL
+              value: "temporal.temporal.svc:7233" # Assumes a Kubernetes service named 'temporal' on port 7233
+            - name: TASK_QUEUE
+              value: "money-transfer"
+            - name: PORT
+              value: "8080"
+          readinessProbe:
+            httpGet:
+              path: / # Assuming the UI serves a page at the root path
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: / # Assuming the UI serves a page at the root path
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      # Note on depends_on: Docker Compose's 'depends_on' is for startup order.
+      # In Kubernetes, services are expected to be resilient to dependencies not being immediately available.
+      # Readiness/liveness probes and application-level retry logic are used.
+      # This UI depends on 'worker-baseline' indirectly via the Temporal server.
+      # Ensure 'temporal.temporal.svc:7233' is resolvable and the Temporal server is running.
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-py-client-ui
+  labels:
+    app: temporal-py-client-ui
+spec:
+  type: LoadBalancer # Or NodePort/ClusterIP depending on your exposure needs
+  selector:
+    app: temporal-py-client-ui
+  ports:
+    - protocol: TCP
+      port: 8080       # Port exposed externally by the service
+      targetPort: 8080 # Port on the pods/containers

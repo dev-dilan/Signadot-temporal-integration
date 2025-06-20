@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-ui
+  # namespace: your-namespace # Optional: Uncomment and specify if deploying to a specific namespace
+  labels:
+    app: temporal-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: temporal-ui
+  template:
+    metadata:
+      labels:
+        app: temporal-ui
+    spec:
+      containers:
+        - name: temporal-ui
+          # IMPORTANT: Replace 'temporalio/ui:2.16.0' with the specific version
+          # matching ${TEMPORAL_UI_VERSION} from your .env file or compose setup.
+          image: temporalio/ui:2.16.0 # Example version, please update
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http-ui
+          env:
+            - name: TEMPORAL_ADDRESS
+              # Assumes a Kubernetes service named 'temporal' on port 7233
+              value: "temporal:7233"
+            - name: TEMPORAL_CORS_ORIGINS
+              # Adjust this if your UI will be accessed from different origins in K8s
+              value: "http://localhost:3000" # Added localhost:8080 for direct access via port-forward or LoadBalancer
+            # The UI image typically listens on port 8080 by default.
+            # No explicit PORT env var is usually needed unless the image is customized.
+          readinessProbe:
+            httpGet:
+              path: / # The UI usually serves its main page at the root
+              port: http-ui
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http-ui
+            initialDelaySeconds: 20
+            periodSeconds: 15
+      # Note on depends_on:
+      # Kubernetes handles service dependencies differently. The UI will attempt to connect
+      # to the 'temporal' service. Ensure the 'temporal' service is running and resolvable.
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-ui # namespace: your-namespace # Optional: Uncomment and specify if deploying to a specific namespace
+  labels:
+    app: temporal-ui
+spec:
+  type: LoadBalancer # Exposes the service on a cluster-internal IP. Default type.
+  ports:
+    - protocol: TCP
+      port: 8080       # Port exposed externally by the service
+      targetPort: http-ui # Refers to 'name: http-ui' on the container port (8080)
+  selector:
+    app: temporal-ui    # Selects pods with label app=temporal-ui

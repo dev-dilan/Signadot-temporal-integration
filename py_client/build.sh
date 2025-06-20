@@ -4,13 +4,13 @@
 set -e
 
 # Configuration
-IMAGE_NAME="temporal-money-transfer"
-VERSION="baseline-v1.0"
+IMAGE_NAME="temporal-py-client-ui"
+VERSION="v1.0"
 REGISTRY="asia-docker.pkg.dev/itone-295207/casino-backend"  # Replace with your actual registry
 FULL_IMAGE_NAME="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 
 echo "=================================================="
-echo "Building Temporal Money Transfer Worker (Baseline)"
+echo "Building Temporal Money Transfer Worker Executor GUI"
 echo "=================================================="
 echo "Image: ${FULL_IMAGE_NAME}"
 echo "Build Date: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
