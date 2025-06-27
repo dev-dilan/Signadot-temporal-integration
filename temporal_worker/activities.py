@@ -2,7 +2,7 @@ import uuid
 import asyncio
 from decimal import Decimal
 from temporalio import activity
-from models import WithdrawRequest, WithdrawResponse, DepositRequest, DepositResponse, FraudDetectionRequest, FraudDetectionResponse, PaymentDetails
+from models import WithdrawRequest, WithdrawResponse, DepositRequest, DepositResponse
 
 class BankingActivities:
     """Banking activities implementation"""
@@ -102,37 +102,6 @@ class BankingActivities:
                 success=False,
                 message=f"Deposit failed: {str(e)}"
             )
-
-    @activity.defn
-    async def detect_fraud(self, request: FraudDetectionRequest) -> FraudDetectionResponse:
-        """Detect potential fraud in a transaction"""
-        activity.logger.info(f"Performing fraud detection for payment from {request.payment_details.from_account} to {request.payment_details.to_account} for amount {request.payment_details.amount}")
-
-        # Simulate fraud detection processing time
-        await asyncio.sleep(0.2) 
-
-        # Example fraud detection logic (very basic)
-        # In a real system, this would involve complex rules, machine learning models, etc.
-        is_fraudulent = False
-        reason = "Transaction appears normal."
-        risk_score = 0.1
-
-        amount = Decimal(request.payment_details.amount)
-
-        if amount > Decimal('1000.00'):
-            is_fraudulent = True
-            reason = "Transaction amount exceeds $1000.00, flagging for review."
-            risk_score = 0.8
-            activity.logger.warning(f"Potential fraud detected: {reason}")
-        elif request.payment_details.to_account == "acc_suspicious": # Example of a known suspicious account
-            is_fraudulent = True
-            reason = "Transaction to a known suspicious account."
-            risk_score = 0.95
-            activity.logger.warning(f"Potential fraud detected: {reason}")
-        else:
-            activity.logger.info("Fraud detection: No suspicious activity found.")
-
-        return FraudDetectionResponse(is_fraudulent=is_fraudulent, reason=reason, risk_score=risk_score)
     
     async def _get_account_balance(self, account_id: str) -> Decimal:
         """Simulate getting account balance from database"""

@@ -15,24 +15,7 @@ class MoneyTransferWorkflow:
         workflow.logger.info(f"Starting money transfer: {payment_details.from_account} -> {payment_details.to_account}, amount: {payment_details.amount}")
         
         try:
-            # Step 0: Fraud Detection
-            fraud_check_request = FraudDetectionRequest(payment_details=payment_details)
-            fraud_check_result = await workflow.execute_activity(
-                BankingActivities.detect_fraud,
-                fraud_check_request,
-                start_to_close_timeout=timedelta(seconds=15), # Shorter timeout for fraud check
-                retry_policy=RetryPolicy(
-                    maximum_attempts=2, # Fewer retries for fraud check
-                )
-            )
-
-            if fraud_check_result.is_fraudulent:
-                workflow.logger.warning(f"Fraud detected: {fraud_check_result.reason}. Aborting transfer.")
-                # You could also raise an ApplicationError here to fail the workflow more explicitly
-                # from temporalio.exceptions import ApplicationError
-                # raise ApplicationError(f"Fraud detected: {fraud_check_result.reason}", type="FraudError", non_retryable=True)
-                return f"Transfer aborted due to fraud detection: {fraud_check_result.reason}"
-
+            
             # Step 1: Withdraw money from source account
             withdraw_request = WithdrawRequest(
                 account_id=payment_details.from_account,
