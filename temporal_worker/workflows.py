@@ -6,7 +6,7 @@ from activities import BankingActivities
 
 @workflow.defn
 class MoneyTransferWorkflow:
-    """Baseline money transfer workflow - 2 step process"""
+    """Sandbox money transfer workflow - 3 step process"""
     
     @workflow.run
     async def run(self, payment_details: PaymentDetails) -> str:
