@@ -48,9 +48,7 @@ spec:
     spec:
       containers:
         - name: temporal
-          # IMPORTANT: Replace 'temporalio/auto-setup:1.21.3' with the specific version
-          # matching ${TEMPORAL_VERSION} from your .env file or compose setup.
-          image: temporalio/auto-setup:1.21.3 # Example version, please update
+          image: temporalio/auto-setup:1.27.2
           imagePullPolicy: Always
           ports:
             - containerPort: 7233
@@ -85,9 +83,9 @@ spec:
               value: "v7"
             # TEMPORAL_ADDRESS and TEMPORAL_CLI_ADDRESS point to the K8s service for Temporal itself
             - name: TEMPORAL_ADDRESS
-              value: "temporal:7233"
+              value: "temporal.temporal.svc:7233"
             - name: TEMPORAL_CLI_ADDRESS
-              value: "temporal:7233"
+              value: "temporal.temporal.svc:7233"
           volumeMounts:
             - name: dynamic-config-volume
               mountPath: /etc/temporal/config/dynamicconfig # Mount directory for the config

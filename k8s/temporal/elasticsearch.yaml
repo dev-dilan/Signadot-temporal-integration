@@ -28,7 +28,7 @@ spec:
           # IMPORTANT: Replace 'elasticsearch:7.17.0' with the specific version
           # matching ${ELASTICSEARCH_VERSION} from your .env file or compose setup.
           # e.g., if ELASTICSEARCH_VERSION=7.10.2, use image: elasticsearch:7.10.2
-          image: elasticsearch:7.17.0
+          image: elasticsearch:7.17.27
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9200

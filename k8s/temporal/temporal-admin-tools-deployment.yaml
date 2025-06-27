@@ -17,17 +17,15 @@ spec:
     spec:
       containers:
         - name: temporal-admin-tools
-          # IMPORTANT: Replace 'temporalio/admin-tools:1.21.0' with the specific version
-          # matching ${TEMPORAL_ADMINTOOLS_VERSION} from your .env file or compose setup.
-          image: temporalio/admin-tools:1.21.0 # Example version, please update
+          image: temporalio/admin-tools:1.27.2-tctl-1.18.2-cli-1.3.0
           imagePullPolicy: IfNotPresent
           env:
             - name: TEMPORAL_ADDRESS
               # Assumes a Kubernetes service named 'temporal' on port 7233
-              value: "temporal:7233"
+              value: "temporal.temporal.svc:7233"
             - name: TEMPORAL_CLI_ADDRESS
               # Assumes a Kubernetes service named 'temporal' on port 7233
-              value: "temporal:7233"
+              value: "temporal.temporal.svc:7233"
           # These allow you to run 'kubectl exec -it <pod-name> -- /bin/bash' (or tctl directly)
           stdin: true
           tty: true
