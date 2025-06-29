@@ -21,8 +21,8 @@ import temporalio.workflow as workflow # For accessing workflow context
 # Default config values mirroring the python example (can be overridden by env vars)
 DEFAULT_ROUTE_SERVER_ADDR = "http://localhost" # Default address for the routing rules API
 DEFAULT_BASELINE_KIND = "Deployment"
-DEFAULT_BASELINE_NAMESPACE = "default"
-DEFAULT_BASELINE_NAME = "location" # Placeholder, configure as needed
+DEFAULT_BASELINE_NAMESPACE = "temporal"
+DEFAULT_BASELINE_NAME = "temporal-worker-baseline" # Placeholder, configure as needed
 DEFAULT_REFRESH_INTERVAL = 5 # seconds
 
 class RoutesAPIClient:
