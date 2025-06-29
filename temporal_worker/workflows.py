@@ -1,7 +1,7 @@
 from datetime import timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
-from models import PaymentDetails, WithdrawRequest, DepositRequest, FraudDetectionRequest
+from models import PaymentDetails, WithdrawRequest, DepositRequest
 from activities import BankingActivities
 
 @workflow.defn

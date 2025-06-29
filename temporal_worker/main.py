@@ -32,7 +32,6 @@ async def main():
             task_queue=task_queue,
             workflows=[MoneyTransferWorkflow],
             activities=[
-                banking_activities.detect_fraud,
                 banking_activities.withdraw,
                 banking_activities.deposit,
             ]
