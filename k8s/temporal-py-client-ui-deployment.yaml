@@ -17,7 +17,7 @@ spec:
       containers:
         - name: temporal-py-client-ui
           # It's recommended to use specific image tags instead of 'latest' in production.
-          image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-py-client-ui:v1.0
+          image: "<your-temporal-client-image:tag>"
           ports:
             - containerPort: 8080
           env:
