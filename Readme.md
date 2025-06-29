@@ -1,6 +1,11 @@
-# Signadot Temporal integration
+# Signadot Temporal integration with Kubernetes
 
 This repository demonstrates an example of integrating Signadot with Temporal workflows.
+
+## Prerequisites
+
+*   A running Kubernetes cluster.
+*   `kubectl` installed and configured to communicate with your cluster.
 
 ## Getting Started
 
@@ -14,49 +19,44 @@ To get started with this example, follow these steps:
     ```bash
     cd <REPOSITORY_DIRECTORY_NAME>
     ```
-3.  **Make the scripts executable:**
+3.  **Create a namespace for Temporal:**
     ```bash
-    chmod +x init.sh
-    chmod +x down.sh
+    kubectl create ns temporal
     ```
-4.  **Run the initialization script:**
+4.  **Deploy the temporal server to Kubernetes:**
     ```bash
-    ./init.sh
+    kubectl apply -f k8s/temporal/ -n temporal
     ```
+4.  **Deploy the application to Kubernetes:**
+    ```bash
+    kubectl apply -f k8s/ -n temporal
+6.  **Access the services:**
+    To access the services, you'll need to forward their ports from the cluster to your local machine. Open a separate terminal for each port-forward command.
 
-After running `init.sh`, the following services will be available:
+    *   **Temporal Admin Dashboard:**
+        ```bash
+        kubectl port-forward svc/temporal-web 8080:8080 -n temporal
+        ```
+        The dashboard will be available at http://localhost:8080.
 
-*   **Temporal Admin Dashboard:** http://localhost:8080 - Provides an interface for managing and monitoring your Temporal workflows.
-*   **Workflow Web GUI:** http://localhost:8000 - A web interface for interacting with and managing workflow tasks.
+    *   **Workflow Web GUI:**
+        ```bash
+        kubectl port-forward svc/web-gui 8000:8000 -n temporal
+        ```
+        The GUI will be available at http://localhost:8000.
 
 ## Observing Workflow Execution
 
-1.  Open the **Workflow Web GUI** at http://localhost:8000.
-2.  Fill out the "Money Transfer Form" and click "Submit".
-3.  Navigate to the **Temporal Admin Dashboard** at http://localhost:8080.
-4.  Go to the "Workflows" section. You should see the newly created workflow.
-5.  Clicking on the workflow will show you its details, including the input payload, headers, execution history, and current status, often presented in JSON format.
-
-## Injecting Headers into Workflows
-
-Navigate to the `node_client/client_server.js` file to see this in context. When preparing the `workflowOptions` for starting a workflow, you can include a `headers` object:
-
-```javascript        
-        const workflowOptions = {
-            args: [paymentDetails], // Workflow arguments are passed as an array
-            taskQueue: TASK_QUEUE,
-            workflowId: workflowId,
-            headers: {
-                // Example: setting a 'sd-routing-key'
-                'sd-routing-key': defaultPayloadConverter.toPayload('abc-123'),
-            },
-        };
-```
+1.  Ensure you have port-forwarded the services as described in the "Getting Started" section.
+2.  Open the **Workflow Web GUI** at http://localhost:8000.
+3.  Fill out the "Money Transfer Form" and click "Submit".
+4.  Navigate to the **Temporal Admin Dashboard** at http://localhost:8080.
+5.  Go to the "Workflows" section. You should see the newly created workflow.
+6.  Clicking on the workflow will show you its details, including the input payload, headers, execution history, and current status, often presented in JSON format.
 
 ## Cleaning Up Resources
 
-To stop all running services, remove the containers, networks, and volumes created by `docker-compose up`, execute the cleanup script:
-
+To remove all the Kubernetes resources and the namespace created for this example, run:
 ```bash
-./down.sh
+kubectl delete ns temporal
 ```
