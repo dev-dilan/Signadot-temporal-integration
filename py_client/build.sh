@@ -6,7 +6,7 @@ set -e
 # Configuration
 IMAGE_NAME="temporal-py-client-ui"
 VERSION="v1.0"
-REGISTRY="asia-docker.pkg.dev/itone-295207/casino-backend"  # Replace with your actual registry
+REGISTRY="${REGISTRY:-hub.docker.com}"  # Replace with your actual registry
 FULL_IMAGE_NAME="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 
 echo "=================================================="
