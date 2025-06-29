@@ -18,12 +18,12 @@ spec:
       containers:
         - name: temporal-worker-baseline
           # It's recommended to use specific image tags instead of 'latest' in production.
-          image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-money-transfer:baseline-v1.0
+          image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-money-transfer:sandbox
           env:
             - name: TASK_QUEUE
               value: "money-transfer"
-            # - name: SANDBOX_NAME
-            #   value: "location-breaking-format"
+            - name: SANDBOX_NAME
+              value: "temporal-worker"
             - name: TEMPORAL_SERVER_URL
               value: "temporal.temporal.svc:7233" # Assumes a Kubernetes service named 'temporal' on port 7233
             - name: ROUTES_API_ROUTE_SERVER_ADDR
