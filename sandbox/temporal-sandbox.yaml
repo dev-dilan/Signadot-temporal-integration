@@ -11,7 +11,7 @@ spec:
        namespace: temporal
      customizations:
        images:
-        - image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-money-transfer:sandbox
+        - image: "<your-temporal-worker-image:tag>"
        env:
         - name: SANDBOX_NAME
           value: "temporal-worker-sb"
