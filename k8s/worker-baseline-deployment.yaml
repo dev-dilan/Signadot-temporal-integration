@@ -22,8 +22,6 @@ spec:
           env:
             - name: TASK_QUEUE
               value: "money-transfer"
-            # - name: SANDBOX_NAME
-            #   value: "location-breaking-format"
             - name: TEMPORAL_SERVER_URL
               value: "temporal.temporal.svc:7233" # Assumes a Kubernetes service named 'temporal' on port 7233
             - name: ROUTES_API_ROUTE_SERVER_ADDR
