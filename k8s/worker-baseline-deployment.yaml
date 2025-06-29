@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: temporal-worker-baseline
+      annotations:
+        sidecar.signadot.com/inject: "true"
     spec:
       # Note: restartPolicy for Pods defaults to Always, which is suitable here.
       containers:
