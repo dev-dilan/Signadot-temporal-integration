@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: temporal-worker-baseline
+  name: temporal-worker-sb
   labels:
-    app: temporal-worker-baseline
+    app: temporal-worker-sb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: temporal-worker-baseline
+      app: temporal-worker-sb
   template:
     metadata:
       labels:
-        app: temporal-worker-baseline
+        app: temporal-worker-sb
     spec:
       # Note: restartPolicy for Pods defaults to Always, which is suitable here.
       containers:
-        - name: temporal-worker-baseline
+        - name: temporal-worker-sb
           # It's recommended to use specific image tags instead of 'latest' in production.
           image: asia-docker.pkg.dev/itone-295207/casino-backend/temporal-money-transfer:sandbox
           env:
             - name: TASK_QUEUE
               value: "money-transfer"
             - name: SANDBOX_NAME
-              value: "temporal-worker"
+              value: "temporal-worker-sb"
             - name: TEMPORAL_SERVER_URL
               value: "temporal.temporal.svc:7233" # Assumes a Kubernetes service named 'temporal' on port 7233
             - name: ROUTES_API_ROUTE_SERVER_ADDR
@@ -45,13 +45,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: temporal-worker-baseline
+  name: temporal-worker-sb
   labels:
-    app: temporal-worker-baseline
+    app: temporal-worker-sb
 spec:
   type: ClusterIP # Or NodePort/ClusterIP depending on your exposure needs
   selector:
-    app: temporal-worker-baseline
+    app: temporal-worker-sb
   ports:
     - protocol: TCP
       port: 7233       # Port exposed externally by the service
