@@ -5,6 +5,8 @@ import aiohttp
 from typing import List, Any, Optional, Set, Dict, Type
 from temporalio.api.common.v1 import Payload
 from urllib.parse import urlencode, urlunparse, urlparse, ParseResult
+from opentelemetry import baggage
+from opentelemetry.baggage.propagation import W3CBaggagePropagator
 
 from temporalio.worker import Worker, Interceptor
 from temporalio.client import Client
@@ -24,6 +26,7 @@ DEFAULT_BASELINE_KIND = "Deployment"
 DEFAULT_BASELINE_NAMESPACE = "default"
 DEFAULT_BASELINE_NAME = "location" # Placeholder, configure as needed
 DEFAULT_REFRESH_INTERVAL = 5 # seconds
+ROUTING_KEY = "sd-routing-key"
 
 class RoutesAPIClient:
 
@@ -171,17 +174,27 @@ class SelectiveTaskInterceptor(Interceptor):
         self.sandbox_name = os.getenv("SANDBOX_NAME", "")
         self.routes_client = routes_client
 
+    def extract_routing_key_from_baggage(self, baggage_header_value: str) -> str :
+
+        if not baggage_header_value:
+            return None
+        
+        carrier ={'baggage': baggage_header_value}
+        ctx = W3CBaggagePropagator().extract(carrier=carrier)
+
+        return baggage.get_baggage(ROUTING_KEY, ctx)
+
     def workflow_interceptor_class(self, input: WorkflowInterceptorClassInput) -> Optional[Type[WorkflowInboundInterceptor]]:
 
-        routes_client = self.routes_client
-        sandbox_name = self.sandbox_name
+        outer_self = self
 
         class _SelectiveWorkflowInboundInterceptor(WorkflowInboundInterceptor):
     
             def __init__(self, next_interceptor: WorkflowInboundInterceptor):
                 super().__init__(next_interceptor)
-                self.routes_client = routes_client
-                self.sandbox_name = sandbox_name
+                self.routes_client = outer_self.routes_client
+                self.sandbox_name = outer_self.sandbox_name
+                self.outer = outer_self
 
             async def execute_workflow(self, input: ExecuteWorkflowInput) -> Any:
                 
@@ -190,11 +203,12 @@ class SelectiveTaskInterceptor(Interceptor):
                     workflow_info = workflow.info()
                     headers = workflow_info.headers if hasattr(workflow_info, 'headers') else {}
 
-                    # Get routing key from headers
-                    routing_key = headers.get("sd-routing-key").data.decode('utf-8') if headers else ""
+                    baggage = headers.get("baggage").data.decode('utf-8') if "baggage" in headers else ""
+                    # Get routing key from baggage header
+                    routing_key = self.outer.extract_routing_key_from_baggage(baggage) if baggage else ""
                     
                     # Check if we should process this workflow
-                    if routes_client and not await self.routes_client.should_process(routing_key):
+                    if self.routes_client and not await self.routes_client.should_process(routing_key):
                         print(f"Skipping workflow with routing key {routing_key} (sandbox: {self.sandbox_name})")
                         raise SkipExecutionError(f"Workflow not for sandbox {self.sandbox_name}")
                     

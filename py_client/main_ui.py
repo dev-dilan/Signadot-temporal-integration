@@ -4,7 +4,6 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from decimal import Decimal, InvalidOperation
-from baggage import Baggage
 
 # Assuming client.py and models.py are in the same directory or accessible
 # Ensure this import path is correct based on your project structure
@@ -36,8 +35,7 @@ async def handle_start_workflow(
     """API endpoint to receive form data and start the Temporal workflow."""
     
     try:
-        baggage = Baggage()
-        
+                
         # Basic validation
         if from_account == to_account:
             return JSONResponse(status_code=400, content={"error": "From and To accounts cannot be the same."})
@@ -57,7 +55,7 @@ async def handle_start_workflow(
         )
         
         # Use None if routing_key is empty string, otherwise pass the value
-        effective_routing_key = baggage.extract_routing_key_from_baggage(request.headers['baggage']) if request.headers.get('baggage') else None        
+        effective_routing_key = request.headers.get('baggage') if request.headers.get('baggage') else None        
 
         result = await start_workflow_with_routing(
             payment_details=payment,

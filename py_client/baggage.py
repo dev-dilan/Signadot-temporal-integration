@@ -1,4 +1,5 @@
-import urllib.parse
+from opentelemetry import baggage
+from opentelemetry.baggage.propagation import W3CBaggagePropagator
 
 ROUTING_KEY = "sd-routing-key"
 
@@ -8,6 +9,19 @@ class Baggage:
 
         if not baggage_header_value:
             return None
+        
+        b2 ={'baggage': baggage_header_value['baggage']}
+        ctx = W3CBaggagePropagator().extract(carrier=b2)
+
+        return baggage.get_baggage(ROUTING_KEY, ctx)
+        # baggage_items = dict()
+        
+        # Collect baggage key-value pairs from context
+        # for key in propagator.fields:
+            # value = carrier.get(key)
+            # if value:
+            #     baggage_items.update({k: v.value for k, v in context.baggage.items()})
+
         
         # Split the baggage string by comma for multiple entries
         entries = baggage_header_value.split(',')

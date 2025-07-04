@@ -5,6 +5,7 @@ from temporalio.client import Client, Interceptor, OutboundInterceptor
 from temporalio.client import StartWorkflowInput
 from temporalio.api.common.v1 import Payload
 from models import PaymentDetails # Ensure models.py is accessible
+from baggage import Baggage
 
 class HeaderInterceptor(Interceptor):
     def __init__(self, headers: dict):
@@ -40,7 +41,7 @@ async def start_workflow_with_routing(payment_details: PaymentDetails, routing_k
     # Prepare headers
     headers = {} # Corrected variable name from headers_dict to headers
     if routing_key:
-        headers["sd-routing-key"] = routing_key
+        headers["baggage"] = routing_key
 
     client = await Client.connect(temporal_server_url, interceptors=[HeaderInterceptor(headers)] if headers else [])    
 
@@ -53,7 +54,7 @@ async def start_workflow_with_routing(payment_details: PaymentDetails, routing_k
         task_queue=task_queue
     )
     
-    result_message = f"Started workflow with ID: {handle.id}, Run ID: {handle.result_run_id}, Routing Key: {routing_key or 'None (baseline)'}"
+    result_message = f"Started workflow with ID: {handle.id}, Run ID: {handle.result_run_id}, Routing Key: {Baggage().extract_routing_key_from_baggage(headers) or 'None (baseline)'}"
     print(result_message)
     return {
         "message": result_message,

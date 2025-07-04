@@ -3,3 +3,7 @@ temporalio==1.4.0
 
 # HTTP client for Routes API
 aiohttp==3.9.0
+
+# otel SDK
+opentelemetry-api>=1.23.0
+opentelemetry-sdk>=1.23.0
